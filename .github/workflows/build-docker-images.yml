@@ -25,24 +25,24 @@ jobs:
     strategy:
       matrix:
         IMAGE:
-          - {TAG_NAME: "gwblake/cryptography-runner-centos7", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos7"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-centos7", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos7"}
           - {TAG_NAME: "gwblake/cryptography-runner-centos8", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos8"}
-          - {TAG_NAME: "gwblake/cryptography-runner-centos8-fips", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos8", BUILD_ARGS: "--build-arg FIPS=1"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-centos8-fips", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos8", BUILD_ARGS: "--build-arg FIPS=1"}
 
-          - {TAG_NAME: "gwblake/cryptography-runner-fedora", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/fedora"}
-          - {TAG_NAME: "gwblake/cryptography-runner-alpine", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/alpine"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-fedora", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/fedora"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-alpine", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/alpine"}
 
-          - {TAG_NAME: "gwblake/cryptography-runner-stretch", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=stretch"}
-          - {TAG_NAME: "gwblake/cryptography-runner-buster", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=buster"}
-          - {TAG_NAME: "gwblake/cryptography-runner-bullseye", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=bullseye"}
-          - {TAG_NAME: "gwblake/cryptography-runner-sid", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=sid"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-stretch", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=stretch"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-buster", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=buster"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-bullseye", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=bullseye"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-sid", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=sid"}
 
-          - {TAG_NAME: "gwblake/cryptography-runner-ubuntu-bionic", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=bionic"}
-          - {TAG_NAME: "gwblake/cryptography-runner-ubuntu-focal", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=focal"}
-          - {TAG_NAME: "gwblake/cryptography-runner-ubuntu-rolling", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=rolling"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-ubuntu-bionic", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=bionic"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-ubuntu-focal", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=focal"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-ubuntu-rolling", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=rolling"}
 
-          - {TAG_NAME: "gwblake/cryptography-manylinux1", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux1"}
-          - {TAG_NAME: "gwblake/cryptography-manylinux2010", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux2010"}
+          #- {TAG_NAME: "gwblake/cryptography-manylinux1", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux1"}
+          #- {TAG_NAME: "gwblake/cryptography-manylinux2010", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux2010"}
 
 
     name: "Building docker image ${{ matrix.IMAGE.TAG_NAME }}"
@@ -72,22 +72,22 @@ jobs:
     strategy:
       matrix:
         IMAGE:
-          - {TAG_NAME: "gwblake/cryptography-runner-centos7", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/centos7"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-centos7", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/centos7"}
           - {TAG_NAME: "gwblake/cryptography-runner-centos8", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/centos8"}
-          - {TAG_NAME: "gwblake/cryptography-runner-centos8-fips", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/centos8", BUILD_ARGS: "--build-arg FIPS=1"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-centos8-fips", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/centos8", BUILD_ARGS: "--build-arg FIPS=1"}
 
-          - {TAG_NAME: "gwblake/cryptography-runner-fedora", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/fedora"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-fedora", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/fedora"}
 
-          - {TAG_NAME: "gwblake/cryptography-runner-stretch", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=stretch"}
-          - {TAG_NAME: "gwblake/cryptography-runner-buster", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=buster"}
-          - {TAG_NAME: "gwblake/cryptography-runner-bullseye", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=bullseye"}
-          - {TAG_NAME: "gwblake/cryptography-runner-sid", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=sid"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-stretch", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=stretch"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-buster", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=buster"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-bullseye", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=bullseye"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-sid", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=sid"}
 
-          - {TAG_NAME: "gwblake/cryptography-runner-ubuntu-bionic", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=bionic"}
-          - {TAG_NAME: "gwblake/cryptography-runner-ubuntu-focal", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=focal"}
-          - {TAG_NAME: "gwblake/cryptography-runner-ubuntu-rolling", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=rolling"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-ubuntu-bionic", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=bionic"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-ubuntu-focal", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=focal"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-ubuntu-rolling", ARCH_TAG: "arm64", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=rolling"}
 
-          - {TAG_NAME: "gwblake/cryptography-manylinux2014_aarch64", ARCH_TAG: "arm64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux2014_aarch64"}
+          #- {TAG_NAME: "gwblake/cryptography-manylinux2014_aarch64", ARCH_TAG: "arm64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux2014_aarch64"}
 
 
     name: "Building docker image ${{ matrix.IMAGE.TAG_NAME }}"
@@ -112,6 +112,8 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/manylinux2014_aarch64' #&& github.ref == 'refs/heads/master'
+      - name: Show images
+        run: docker images
       - name: Push image
         run: docker push ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }}
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/manylinux2014_aarch64' #&& github.ref == 'refs/heads/master'
