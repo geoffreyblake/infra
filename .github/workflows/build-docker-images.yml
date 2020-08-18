@@ -105,7 +105,10 @@ jobs:
       - name: Pull existing image
         run: docker pull ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }} || true
       - name: Build image
-        run: docker buildx build --platform linux/arm64 --pull --cache-from ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }} -t ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }} ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
+        run: >
+          docker buildx build --platform linux/arm64 --pull --cache-from ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }}
+          --cache-t "type=local,dest=/tmp/.buildx-cache" --output "type=image,push=false"
+          -t ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }} ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
       - name: Login to docker
         run: 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"'
         env:
@@ -115,7 +118,10 @@ jobs:
       - name: Show images
         run: docker images
       - name: Push image
-        run: docker push ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }}
+        run: >
+          docker buildx build --cache-from "type=local,src=/tmp/.buildx-cache"
+          --platform linux/arm64 --output "type=image,push=true" -t ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }}
+          ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/manylinux2014_aarch64' #&& github.ref == 'refs/heads/master'
       - name: Create a manifest
         run: docker manifest create ${{ matrix.IMAGE.TAG_NAME }}:latest --amend ${{ matrix.IMAGE.TAG_NAME }}:x86_64 --amend ${{ matrix.IMAGE.TAG_NAME }}:arm64
