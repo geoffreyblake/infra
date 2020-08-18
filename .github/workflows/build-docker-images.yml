@@ -107,7 +107,7 @@ jobs:
       - name: Build image
         run: >
           docker buildx build --platform linux/arm64 --pull --cache-from ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }}
-          --cache-t "type=local,dest=/tmp/.buildx-cache" --output "type=image,push=false"
+          --cache-to "type=local,dest=/tmp/.buildx-cache" --output "type=image,push=false"
           -t ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }} ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
       - name: Login to docker
         run: 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"'
