@@ -18,6 +18,7 @@ on:
       - 'cryptography-manylinux/**'
 
 jobs:
+  # Build the containers that support both arm64 and x86_64
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -28,7 +29,6 @@ jobs:
           - {TAG_NAME: "pyca/cryptography-runner-centos8-fips", DOCKERFILE_PATH: "runners/centos8", BUILD_ARGS: "--build-arg FIPS=1"}
 
           - {TAG_NAME: "pyca/cryptography-runner-fedora", DOCKERFILE_PATH: "runners/fedora"}
-          - {TAG_NAME: "pyca/cryptography-runner-alpine", DOCKERFILE_PATH: "runners/alpine"}
 
           - {TAG_NAME: "pyca/cryptography-runner-stretch", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=stretch"}
           - {TAG_NAME: "pyca/cryptography-runner-buster", DOCKERFILE_PATH: "runners/debian", BUILD_ARGS: "--build-arg RELEASE=buster"}
@@ -39,8 +39,51 @@ jobs:
           - {TAG_NAME: "pyca/cryptography-runner-ubuntu-focal", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=focal"}
           - {TAG_NAME: "pyca/cryptography-runner-ubuntu-rolling", DOCKERFILE_PATH: "runners/ubuntu", BUILD_ARGS: "--build-arg RELEASE=rolling"}
 
-          - {TAG_NAME: "pyca/cryptography-manylinux1:x86_64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux1"}
-          - {TAG_NAME: "pyca/cryptography-manylinux2010:x86_64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux2010"}
+    name: "Building docker image ${{ matrix.IMAGE.TAG_NAME }}"
+    steps:
+      - uses: actions/checkout@master
+      - name: Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v3.3.0
+        with:
+          buildx-version: latest
+          qemu-version: latest
+      # Pull the previous image, but if it fails return true anyway.
+      # Sometimes we add new docker images and if they've never been pushed
+      # they can't be pulled.
+      - name: Pull existing image
+        run: docker pull ${{ matrix.IMAGE.TAG_NAME }}:latest || true
+      - name: Build image
+        run: >
+          docker buildx build --platform linux/arm64,linux/amd64 --pull --cache-from ${{ matrix.IMAGE.TAG_NAME }}
+          --cache-to "type=local,dest=/tmp/.buildx-cache" --output "type=image,push=false"
+          -t ${{ matrix.IMAGE.TAG_NAME }} ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
+      - name: Login to docker
+        run: 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"'
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
+      - name: Push image
+        run: >
+          docker buildx build --cache-from "type=local,src=/tmp/.buildx-cache"
+          --platform linux/arm64,linux/amd64 --output "type=image,push=true" -t ${{ matrix.IMAGE.TAG_NAME }}
+          ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
+
+  # Build containers that support x86 only
+  build_x86:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        IMAGE:
+          # Rustup installer artifact for Alpine does not exist for aarch64-unknown-linux-musl so it is x86 only for now.
+          # Issue: https://github.com/rust-lang/rustup/issues/2003
+          - {TAG_NAME: "pyca/cryptography-runner-alpine", DOCKERFILE_PATH: "runners/alpine"}
+
+          - {TAG_NAME: "pyca/cryptography-manylinux1", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux1"}
+          - {TAG_NAME: "pyca/cryptography-manylinux2010", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux2010"}
+
 
     name: "Building docker image ${{ matrix.IMAGE.TAG_NAME }}"
     steps:
@@ -60,4 +103,44 @@ jobs:
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
       - name: Push image
         run: docker push ${{ matrix.IMAGE.TAG_NAME }}
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
+
+  # Build the containers that only need aarch64 support
+  build_arm64:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        IMAGE:
+          - {TAG_NAME: "pyca/cryptography-manylinux2014_aarch64", DOCKERFILE_PATH: "cryptography-manylinux", BUILD_ARGS: "-f cryptography-manylinux/Dockerfile-manylinux2014_aarch64"}
+
+    name: "Building docker image ${{ matrix.IMAGE.TAG_NAME }}"
+    steps:
+      - uses: actions/checkout@master
+      - name: Docker Buildx
+        id: buildx
+        uses: crazy-max/ghaction-docker-buildx@v3.3.0
+        with:
+          buildx-version: latest
+          qemu-version: latest
+      # Pull the previous image, but if it fails return true anyway.
+      # Sometimes we add new docker images and if they've never been pushed
+      # they can't be pulled.
+      - name: Pull existing image
+        run: docker pull ${{ matrix.IMAGE.TAG_NAME }}:latest || true
+      - name: Build image
+        run: >
+          docker buildx build --platform linux/arm64 --pull --cache-from ${{ matrix.IMAGE.TAG_NAME }}
+          --cache-to "type=local,dest=/tmp/.buildx-cache" --output "type=image,push=false"
+          -t ${{ matrix.IMAGE.TAG_NAME }} ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
+      - name: Login to docker
+        run: 'docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"'
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
+      - name: Push image
+        run: >
+          docker buildx build --cache-from "type=local,src=/tmp/.buildx-cache"
+          --platform linux/arm64 --output "type=image,push=true" -t ${{ matrix.IMAGE.TAG_NAME }}
+          ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
