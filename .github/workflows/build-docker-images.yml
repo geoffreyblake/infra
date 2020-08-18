@@ -26,7 +26,7 @@ jobs:
       matrix:
         IMAGE:
           #- {TAG_NAME: "gwblake/cryptography-runner-centos7", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos7"}
-          - {TAG_NAME: "gwblake/cryptography-runner-centos8", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos8"}
+          #- {TAG_NAME: "gwblake/cryptography-runner-centos8", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos8"}
           #- {TAG_NAME: "gwblake/cryptography-runner-centos8-fips", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/centos8", BUILD_ARGS: "--build-arg FIPS=1"}
 
           #- {TAG_NAME: "gwblake/cryptography-runner-fedora", ARCH_TAG: "x86_64", DOCKERFILE_PATH: "runners/fedora"}
@@ -120,9 +120,11 @@ jobs:
       - name: Push image
         run: >
           docker buildx build --cache-from "type=local,src=/tmp/.buildx-cache"
-          --platform linux/arm64 --output "type=image,push=true" -t ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }}
+          --platform linux/arm64,linux/amd64 --output "type=image,push=true" -t ${{ matrix.IMAGE.TAG_NAME }}:${{ matrix.IMAGE.ARCH_TAG }}
           ${{ matrix.IMAGE.DOCKERFILE_PATH }} ${{ matrix.IMAGE.BUILD_ARGS }}
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/manylinux2014_aarch64' #&& github.ref == 'refs/heads/master'
+      - name: Enable experimental docker features
+        run: 'echo "{\"experimental\": true}" | sudo tee -a /etc/docker/daemon.json'
       - name: Create a manifest
         run: docker manifest create ${{ matrix.IMAGE.TAG_NAME }}:latest --amend ${{ matrix.IMAGE.TAG_NAME }}:x86_64 --amend ${{ matrix.IMAGE.TAG_NAME }}:arm64
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/manylinux2014_aarch64' #&& github.ref == 'refs/heads/master'
